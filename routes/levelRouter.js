@@ -1,6 +1,7 @@
 const express = require("express");
 const Level = require("../models/levelSchema");
 const levelRouter = express.Router();
+const authenticate = require('../authenticate');
 
 levelRouter
   .route("/")
@@ -13,7 +14,7 @@ levelRouter
       })
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     Level.create(req.body)
       .then((level) => {
         console.log("level Created ", level);
@@ -23,11 +24,11 @@ levelRouter
       })
       .catch((err) => next(err));
   })
-  .put((req, res) => {
+  .put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /levels");
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Level.deleteMany()
       .then((response) => {
         res.statusCode = 200;
@@ -48,11 +49,11 @@ levelRouter
       })
       .catch((err) => next(err));
   })
-  .post((req, res) => {
+  .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /levels/${req.params.levelId}`);
   })
-  .put((req, res, next) => {
+  .put(authenticate.verifyUser, (req, res, next) => {
     Level.findByIdAndUpdate(
       req.params.levelId,
       {
@@ -67,7 +68,7 @@ levelRouter
       })
       .catch((err) => next(err));
   })
-  .delete((req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Level.findByIdAndDelete(req.params.levelId)
       .then((response) => {
         res.statusCode = 200;
@@ -93,7 +94,7 @@ levelRouter
     })
     .catch(err => next(err));
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, (req, res, next) => {
     Level.findById(req.params.levelId)
     .then(level => {
         if (level) {
@@ -113,11 +114,11 @@ levelRouter
     })
     .catch(err => next(err));
 })
-.put((req, res) => {
+.put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`PUT operation not supported on /levels/${req.params.levelId}/feedbacks`);
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, (req, res, next) => {
     Level.findById(req.params.levelId)
     .then(level => {
         if (level) {
@@ -160,11 +161,11 @@ levelRouter.route('/:levelId/feedbacks/:feedbackId')
     })
     .catch(err => next(err));
 })
-.post((req, res) => {
+.post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /levels/${req.params.levelId}/feedbacks/${req.params.feedbackId}`);
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, (req, res, next) => {
     Level.findById(req.params.levelId)
     .then(level => {
         if (level && level.feedbacks.id(req.params.feedbackId)) {
@@ -193,7 +194,7 @@ levelRouter.route('/:levelId/feedbacks/:feedbackId')
     })
     .catch(err => next(err));
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, (req, res, next) => {
     Level.findById(req.params.levelId)
     .then(level => {
         if (level && level.feedbacks.id(req.params.feedbackId)) {
