@@ -14,8 +14,8 @@ const feedbackSchema = new Schema(
       required: true,
     },
     author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
+      required: true,
     },
   },
   {
@@ -48,9 +48,9 @@ const levelSchema = new Schema(
     },
     train: {
       type: Array,
-      required: true
+      required: true,
     },
-    feedback: [feedbackSchema],
+    feedbacks: [feedbackSchema],
   },
   {
     timestamps: true,
