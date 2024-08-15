@@ -17,11 +17,9 @@ const userSchema = new Schema({
     },
     level: {
         type: Number,
-        required: true
     },
     points: {
         type: Number,
-        required: true
     }
 });
 
