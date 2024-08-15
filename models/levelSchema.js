@@ -1,6 +1,28 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const feedbackSchema = new Schema(
+  {
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const levelSchema = new Schema(
   {
     level: {
@@ -8,23 +30,27 @@ const levelSchema = new Schema(
       required: true,
       unique: true,
     },
-    array: [],
+    hint: {
+      type: Boolean,
+      default: false,
+    },
     instructions: {
       type: String,
       required: true,
     },
-    prompt: {
+    challenge: {
       type: String,
       required: true,
     },
-    action: {
+    answer: {
       type: String,
       required: true,
     },
-    hint: {
-        type: Boolean,
-        default: false
-    }
+    train: {
+      type: Array,
+      required: true
+    },
+    feedback: [feedbackSchema],
   },
   {
     timestamps: true,
