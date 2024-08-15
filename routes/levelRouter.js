@@ -3,17 +3,17 @@ const Level = require("../models/levelSchema");
 const levelRouter = express.Router();
 const authenticate = require('../authenticate');
 
-levelRouter
-  .route("/")
-  .get((req, res, next) => {
-    Level.find()
-      .then((levels) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(levels);
-      })
-      .catch((err) => next(err));
-  })
+levelRouter.route('/')
+    .get((req, res, next) => {
+        Level.find()
+        .populate('feedbacks.author')
+        .then(levels => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(levels);
+        })
+        .catch(err => next(err));
+    })
   .post(authenticate.verifyUser, (req, res, next) => {
     Level.create(req.body)
       .then((level) => {
@@ -42,13 +42,14 @@ levelRouter
   .route("/:levelId")
   .get((req, res, next) => {
     Level.findById(req.params.levelId)
-      .then((level) => {
+    .populate('feedbacks.author')
+    .then(level => {
         res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
+        res.setHeader('Content-Type', 'application/json');
         res.json(level);
-      })
-      .catch((err) => next(err));
-  })
+    })
+    .catch(err => next(err));
+})
   .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(`POST operation not supported on /levels/${req.params.levelId}`);
@@ -81,19 +82,20 @@ levelRouter
   levelRouter.route('/:levelId/feedbacks')
 .get((req, res, next) => {
     Level.findById(req.params.levelId)
-    .then(level => {
-        if (level) {
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.json(level.feedbacks);
-        } else {
-            err = new Error(`level ${req.params.levelId} not found`);
-            err.status = 404;
-            return next(err);
-        }
+    .populate('feedbacks.author')
+        .then(level => {
+            if (level) {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(level.feedbacks);
+            } else {
+                err = new Error(`Level ${req.params.levelId} not found`);
+                err.status = 404;
+                return next(err);
+            }
+        })
+        .catch(err => next(err));
     })
-    .catch(err => next(err));
-})
 .post(authenticate.verifyUser, (req, res, next) => {
     Level.findById(req.params.levelId)
     .then(level => {
@@ -144,6 +146,7 @@ levelRouter
 levelRouter.route('/:levelId/feedbacks/:feedbackId')
 .get((req, res, next) => {
     Level.findById(req.params.levelId)
+    .populate('feedbacks.author')
     .then(level => {
         if (level && level.feedbacks.id(req.params.feedbackId)) {
             res.statusCode = 200;
