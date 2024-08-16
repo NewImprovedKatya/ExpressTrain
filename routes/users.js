@@ -6,47 +6,21 @@ const authenticate = require("../authenticate");
 const router = express.Router();
 
 /* GET users listing. */
-/* router.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
-
-router.post("/signup", async (req, res) => {
-  try {
-
-    const user = await new Promise((resolve, reject) => {
-      User.register(
-        new User({ username: req.body.username }),
-        req.body.password,
-        (err, user) => {
-          if (err) reject(err);
-          else resolve(user);
-        }
-      );
-    });
-
-    if (req.body.firstname) {
-      user.firstname = req.body.firstname;
+router.get(
+  "/",
+  authenticate.verifyUser,
+  authenticate.verifyAdmin,
+  async (req, res, next) => {
+    try {
+      const users = await User.find();
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "application/json");
+      res.json(users);
+    } catch (err) {
+      next(err);
     }
-    if (req.body.lastname) {
-      user.lastname = req.body.lastname;
-    }
-
-    await new Promise((resolve, reject) => {
-      user.save((err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
-
-    passport.authenticate("local")(req, res, () => {
-      res
-        .status(200)
-        .json({ success: true, status: "Registration Successful!" });
-    });
-  } catch (err) {
-    res.status(500).json({ err: err.message });
   }
-}); */
+);
 
 router.post("/signup", async (req, res) => {
   try {
